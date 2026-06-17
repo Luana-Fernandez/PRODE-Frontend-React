@@ -17,7 +17,6 @@ function Login() {
         email,
         password
       });
-      alert(response);
 
       localStorage.setItem(
         "token",

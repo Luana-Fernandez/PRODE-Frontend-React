@@ -8,7 +8,7 @@ export async function login(
 ): Promise<LoginResponse> {
 
   const response = await axios.post<LoginResponse>(
-    `${API_URL}/auth`,
+    `${API_URL}/auth/login`,
     data
   );
 
