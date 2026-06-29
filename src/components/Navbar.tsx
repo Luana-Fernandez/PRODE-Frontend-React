@@ -80,14 +80,19 @@ export function Navbar() {
 
           {/* USER INFO */}
           <div className="d-flex align-items-center gap-3">
-            <span className="font-mono small text-light opacity-75">
-              {usuario?.nombreUsuario}
-              {isAdmin && (
-                <span className="badge bg-warning text-dark ms-2">
-                  ADMIN
-                </span>
-              )}
-            </span>
+            <NavLink
+              to="/perfil"
+              className="d-flex align-items-center gap-2 text-decoration-none"
+            >
+              <span className="font-mono small text-light opacity-75">
+                {usuario?.nombreUsuario}
+                {isAdmin && (
+                  <span className="badge bg-warning text-dark ms-2">
+                    ADMIN
+                  </span>
+                )}
+              </span>
+            </NavLink>
 
             <button
               className="btn btn-outline-light btn-sm"

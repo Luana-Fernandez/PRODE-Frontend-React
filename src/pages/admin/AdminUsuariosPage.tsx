@@ -1,11 +1,25 @@
-import { useUsuarios } from '@/hooks/useUsuarios';
+import { useState } from 'react';
+import { useUsuarios, useEliminarUsuario } from '@/hooks/useUsuarios';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { EmptyState } from '@/components/EmptyState';
+import type { UsuarioResponse } from '@/api/usuariosApi';
 
 export function AdminUsuariosPage() {
   const { data: usuarios, isLoading } = useUsuarios();
+  const eliminarUsuario = useEliminarUsuario();
+
+  const [usuarioAEliminar, setUsuarioAEliminar] =
+    useState<UsuarioResponse | null>(null);
 
   if (isLoading) return <LoadingScreen label="Cargando usuarios..." />;
+
+  const confirmarEliminacion = () => {
+    if (!usuarioAEliminar) return;
+
+    eliminarUsuario.mutate(usuarioAEliminar.id, {
+      onSuccess: () => setUsuarioAEliminar(null),
+    });
+  };
 
   return (
     <div>
@@ -26,6 +40,7 @@ export function AdminUsuariosPage() {
                   <th>Email</th>
                   <th>Rol</th>
                   <th>Grupo propio</th>
+                  <th className="text-end">Acciones</th>
                 </tr>
               </thead>
               <tbody>
@@ -42,10 +57,71 @@ export function AdminUsuariosPage() {
                     <td className="font-mono small">
                       {u.idGrupoPropio ? `#${u.idGrupoPropio}` : <span className="text-secondary">—</span>}
                     </td>
+                    <td className="text-end">
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-danger"
+                        onClick={() => setUsuarioAEliminar(u)}
+                      >
+                        <i className="bi bi-trash me-1" />
+                        Eliminar
+                      </button>
+                    </td>
                   </tr>
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE CONFIRMACIÓN */}
+      {usuarioAEliminar && (
+        <div
+          className="modal d-block"
+          style={{ background: 'rgba(0,0,0,0.5)' }}
+          role="dialog"
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Eliminar usuario</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setUsuarioAEliminar(null)}
+                />
+              </div>
+              <div className="modal-body">
+                <p className="mb-0">
+                  ¿Seguro que querés eliminar a{' '}
+                  <strong>{usuarioAEliminar.nombreUsuario}</strong> (
+                  {usuarioAEliminar.email})?
+                </p>
+                <p className="small text-secondary mt-2 mb-0">
+                  El usuario deja de aparecer en el sistema, pero sus datos no
+                  se borran de forma permanente.
+                </p>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  onClick={() => setUsuarioAEliminar(null)}
+                  disabled={eliminarUsuario.isPending}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-danger"
+                  onClick={confirmarEliminacion}
+                  disabled={eliminarUsuario.isPending}
+                >
+                  {eliminarUsuario.isPending ? 'Eliminando...' : 'Eliminar'}
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}
