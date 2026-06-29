@@ -5,7 +5,7 @@ export const prediccionesApi = {
   listar: (estadoPartido?: EstadoPartido) =>
     apiClient
       .get<Prediccion[]>('/api/predicciones', {
-        params: estadoPartido ? { estadoPartido } : undefined,
+        params: estadoPartido ? { estado: estadoPartido } : undefined,
       })
       .then((r) => r.data),
 
