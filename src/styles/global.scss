@@ -1,0 +1,316 @@
+@import 'variables';
+@import '../../node_modules/bootstrap/scss/bootstrap';
+
+// Tipografía global
+
+h1, h2, h3, h4, .font-display {
+  font-family: 'Oswald', $font-family-base;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-transform: uppercase;
+}
+
+.font-mono {
+  font-family: $font-family-monospace;
+}
+
+.text-eyebrow {
+  font-family: 'Oswald', $font-family-base;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: $prode-dorado-600;
+}
+
+
+// Layout general
+
+body {
+  background-color: $prode-crema;
+  background-image:
+    radial-gradient(circle at 100% 0%, rgba($prode-verde-900, 0.05), transparent 45%);
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-main {
+  flex: 1;
+}
+
+
+// Navbar
+
+.prode-navbar {
+  background: linear-gradient(180deg, $prode-verde-900, $prode-verde-950);
+  border-bottom: 3px solid $prode-dorado-500;
+}
+
+.prode-brand {
+  font-family: 'Oswald', $font-family-base;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  font-size: 1.3rem;
+  color: $prode-crema !important;
+
+  .brand-dot {
+    color: $prode-dorado-500;
+  }
+}
+
+.nav-link.prode-link {
+  font-weight: 500;
+  font-size: 0.92rem;
+  border-bottom: 2px solid transparent;
+  transition: border-color 0.15s ease, color 0.15s ease;
+
+  &.active {
+    color: $prode-dorado-300 !important;
+    border-bottom-color: $prode-dorado-500;
+  }
+}
+
+// Scoreboard card (signature element): tarjeta de partido
+
+.scoreboard-card {
+  background: $prode-verde-900;
+  color: $prode-crema;
+  border-radius: $border-radius-lg;
+  border: 1px solid $prode-verde-700;
+  overflow: hidden;
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: repeating-linear-gradient(
+      90deg,
+      rgba($prode-crema, 0.025) 0px,
+      rgba($prode-crema, 0.025) 1px,
+      transparent 1px,
+      transparent 6px
+    );
+    pointer-events: none;
+  }
+
+  .scoreboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.55rem 1rem;
+    background: rgba(0, 0, 0, 0.18);
+    font-family: $font-family-monospace;
+    font-size: 0.72rem;
+    letter-spacing: 0.05em;
+    color: rgba($prode-crema, 0.65);
+  }
+
+  .scoreboard-body {
+    padding: 1.1rem 1.25rem 1.3rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    position: relative;
+    z-index: 1;
+  }
+
+  .scoreboard-team {
+    flex: 1;
+    text-align: center;
+    min-width: 0;
+
+    .team-name {
+      font-family: 'Oswald', $font-family-base;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+  }
+
+  .scoreboard-score {
+    font-family: $font-family-monospace;
+    font-size: 2.1rem;
+    font-weight: 700;
+    line-height: 1;
+    color: $prode-dorado-300;
+    min-width: 4.4ch;
+    text-align: center;
+    letter-spacing: 0.02em;
+  }
+
+  .scoreboard-score-sep {
+    font-family: $font-family-monospace;
+    font-size: 1.4rem;
+    color: rgba($prode-crema, 0.35);
+    padding: 0 0.15rem;
+  }
+}
+
+// Punto de "luz" de estado (encendido cuando EN_JUEGO)
+.status-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 0.4rem;
+
+  &.is-live {
+    background: $prode-rojo-500;
+    box-shadow: 0 0 0 0 rgba($prode-rojo-500, 0.6);
+    animation: pulse-live 1.6s infinite;
+  }
+  &.is-scheduled {
+    background: rgba($prode-crema, 0.35);
+  }
+  &.is-finished {
+    background: $prode-dorado-500;
+  }
+}
+
+@keyframes pulse-live {
+  0% { box-shadow: 0 0 0 0 rgba($prode-rojo-500, 0.55); }
+  70% { box-shadow: 0 0 0 6px rgba($prode-rojo-500, 0); }
+  100% { box-shadow: 0 0 0 0 rgba($prode-rojo-500, 0); }
+}
+
+
+// Badges de estado reutilizables
+
+.badge-estado {
+  font-family: 'Oswald', $font-family-base;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  padding: 0.35em 0.6em;
+  border-radius: $border-radius-sm;
+
+  &.por-jugarse, &.programada {
+    background: rgba($prode-tinta-suave, 0.12);
+    color: $prode-tinta-suave;
+  }
+  &.en-juego {
+    background: rgba($prode-rojo-500, 0.12);
+    color: $prode-rojo-600;
+  }
+  &.finalizado, &.finalizada {
+    background: rgba($prode-dorado-500, 0.18);
+    color: $prode-dorado-600;
+  }
+}
+
+
+// Tarjetas de puntos / resultado de pronóstico
+
+.puntos-pill {
+  font-family: $font-family-monospace;
+  font-weight: 700;
+  font-size: 0.85rem;
+  border-radius: 999px;
+  padding: 0.25em 0.75em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3em;
+
+  &.puntos-3 { background: rgba($prode-dorado-500, 0.2); color: $prode-dorado-600; }
+  &.puntos-1 { background: rgba(#2E6E8E, 0.14); color: #2E6E8E; }
+  &.puntos-0 { background: rgba($prode-tinta-suave, 0.1); color: $prode-tinta-suave; }
+  &.puntos-pendiente { background: rgba($prode-tinta-suave, 0.07); color: $prode-tinta-suave; }
+}
+
+// Ranking / podio
+
+.podio-puesto {
+  font-family: $font-family-monospace;
+  font-weight: 700;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+
+  &.puesto-1 { background: $prode-dorado-500; color: $prode-verde-950; }
+  &.puesto-2 { background: $prode-dorado-300; color: $prode-verde-950; }
+  &.puesto-3 { background: $prode-dorado-100; color: $prode-verde-900; }
+  &.puesto-otro { background: rgba($prode-tinta-suave, 0.1); color: $prode-tinta-suave; }
+}
+
+.fila-ranking-propia {
+  background: rgba($prode-dorado-500, 0.08) !important;
+  border-left: 3px solid $prode-dorado-500;
+}
+
+
+// Login / register
+.auth-shell {
+  min-height: 100vh;
+  display: flex;
+  align-items: stretch;
+}
+
+.auth-side {
+  background:
+    linear-gradient(160deg, $prode-verde-950 0%, $prode-verde-900 55%, $prode-verde-800 100%);
+  color: $prode-crema;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 480px;
+    height: 480px;
+    border: 1px solid rgba($prode-dorado-500, 0.18);
+    border-radius: 50%;
+    right: -180px;
+    bottom: -180px;
+  }
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+}
+
+// Utilidades
+.cursor-pointer { cursor: pointer; }
+
+.text-dorado { color: $prode-dorado-500; }
+.bg-verde-900 { background-color: $prode-verde-900; }
+
+.card-soft {
+  border: 1px solid rgba($prode-tinta, 0.06);
+  box-shadow: 0 1px 3px rgba($prode-tinta, 0.04);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 1.5rem;
+  color: $prode-tinta-suave;
+
+  i {
+    font-size: 2.2rem;
+    color: rgba($prode-tinta-suave, 0.4);
+    display: block;
+    margin-bottom: 0.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-dot.is-live {
+    animation: none;
+  }
+}
