@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAuth } from '@/auth/useAuth';
 import {
@@ -141,6 +141,8 @@ function RankingDeGrupo({ grupoId }: { grupoId: number }) {
   );
 }
 
+type TabGrupos = 'ACTIVOS' | 'INACTIVOS';
+
 export function GruposPage() {
   const { usuario } = useAuth();
   const isAdmin = usuario?.rol === 'ADMIN';
@@ -148,6 +150,15 @@ export function GruposPage() {
   const eliminarGrupo = useEliminarGrupo();
   const [modalAbierto, setModalAbierto] = useState<'crear' | 'unirse' | null>(null);
   const [grupoExpandido, setGrupoExpandido] = useState<number | null>(null);
+  const [tab, setTab] = useState<TabGrupos>('ACTIVOS');
+
+  const gruposFiltrados = useMemo(() => {
+    if (!grupos) return [];
+    // El filtro por tab solo aplica para admin: la vista de usuario común
+    // ya viene filtrada (solo activos) desde el backend.
+    if (!isAdmin) return grupos;
+    return grupos.filter((g) => (tab === 'ACTIVOS' ? g.activo : !g.activo));
+  }, [grupos, isAdmin, tab]);
 
   if (isLoading) return <LoadingScreen label="Cargando grupos..." />;
 
@@ -179,19 +190,41 @@ export function GruposPage() {
         )}
       </div>
 
-      {!grupos || grupos.length === 0 ? (
+      {/* TABS (solo admin) */}
+      {isAdmin && (
+        <div className="d-flex gap-2 mb-3">
+          <button
+            type="button"
+            className={`btn btn-sm ${tab === 'ACTIVOS' ? 'btn-success' : 'btn-outline-secondary'}`}
+            onClick={() => setTab('ACTIVOS')}
+          >
+            Activos
+          </button>
+          <button
+            type="button"
+            className={`btn btn-sm ${tab === 'INACTIVOS' ? 'btn-success' : 'btn-outline-secondary'}`}
+            onClick={() => setTab('INACTIVOS')}
+          >
+            Inactivos
+          </button>
+        </div>
+      )}
+
+      {gruposFiltrados.length === 0 ? (
         <EmptyState
           icon="bi-people"
-          title="No hay grupos"
+          title={isAdmin && tab === 'INACTIVOS' ? 'No hay grupos inactivos' : 'No hay grupos'}
           description={
             isAdmin
-              ? "Todavía no existen grupos registrados."
-              : "Creá uno o unite con un código de invitación."
+              ? tab === 'INACTIVOS'
+                ? 'No hay grupos eliminados por el momento.'
+                : 'Todavía no existen grupos activos registrados.'
+              : 'Creá uno o unite con un código de invitación.'
           }
         />
       ) : (
         <div className="row g-3">
-          {grupos.map((grupo) => {
+          {gruposFiltrados.map((grupo) => {
             const expandido = grupoExpandido === grupo.id;
             return (
               <div className="col-12 col-md-6" key={grupo.id}>
@@ -199,12 +232,17 @@ export function GruposPage() {
                   <div className="card-body">
                     <div className="d-flex justify-content-between align-items-start">
                       <div>
-                        <h5 className="mb-1">{grupo.nombre}</h5>
+                        <h5 className="mb-1">
+                          {grupo.nombre}
+                          {isAdmin && !grupo.activo && (
+                            <span className="badge bg-secondary ms-2">Inactivo</span>
+                          )}
+                        </h5>
                         <span className="font-mono small text-secondary">
                           Código: <strong>{grupo.codigoInvitacion}</strong>
                         </span>
                       </div>
-                      {usuario?.rol === 'ADMIN' && (
+                      {isAdmin && grupo.activo && (
                         <button
                           className="btn btn-sm btn-outline-danger"
                           onClick={() => eliminarGrupo.mutate(grupo.id)}
