@@ -12,14 +12,10 @@ function FormResultado({ partido }: { partido: Partido }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!confirm(`Confirmar resultado: ${partido.equipoLocal.nombre} ${golLocal} - ${golVisitante} ${partido.equipoVisitante.nombre}. Esto calculará los puntos de todos los usuarios.`)) {
-      return;
-    }
     cargarResultado.mutate(
-      { idPartido: partido.id, golLocal, golVisitante },
+      { partidoId: partido.id, golLocal, golVisitante },
       {
         onSuccess: () => { setGolLocal(0); setGolVisitante(0); },
-        onError: () => setTimeout(() => { setGolLocal(0); setGolVisitante(0); }, 1500),
       }
     );
   };
@@ -45,14 +41,15 @@ function FormResultado({ partido }: { partido: Partido }) {
           onChange={(e) => setGolVisitante(Math.max(0, Number(e.target.value)))}
         />
       </div>
-      <button type="submit" className="btn btn-warning btn-sm ms-auto" disabled={cargarResultado.isPending}>
+      <button
+        type="submit"
+        className="btn btn-warning btn-sm ms-auto"
+        disabled={cargarResultado.isPending}
+      >
         {cargarResultado.isPending ? (
           <span className="spinner-border spinner-border-sm" />
         ) : (
-          <>
-            <i className="bi bi-clipboard-check me-1" />
-            Cargar resultado
-          </>
+          <><i className="bi bi-clipboard-check me-1" />Cargar resultado</>
         )}
       </button>
     </form>

@@ -12,6 +12,9 @@ export const gruposApi = {
 
   obtener: (id: number) => apiClient.get<Grupo>(`/grupos/${id}`).then((r) => r.data),
 
+  listarTodos: () =>
+    apiClient.get<Grupo[]>('/grupos').then((r) => r.data),
+
   crear: (usuarioId: number, data: GrupoCreateRequest) =>
     apiClient.post<Grupo>(`/grupos/usuario/${usuarioId}`, data).then((r) => r.data),
 

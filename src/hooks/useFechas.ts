@@ -6,7 +6,8 @@ import type { EstadoFecha, FechaCreateRequest, FechaUpdateRequest } from '@/type
 
 export const fechasKeys = {
   all: ['fechas'] as const,
-  porEstado: (estado: EstadoFecha) => ['fechas', 'estado', estado] as const,
+  porEstado: (estado?: EstadoFecha | 'TODAS') =>
+    ['fechas', 'estado', estado ?? 'TODAS'] as const,
 };
 
 export function useFechas() {

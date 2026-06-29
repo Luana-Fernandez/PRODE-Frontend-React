@@ -37,6 +37,19 @@ export function AdminPartidosPage() {
 
   const equiposActivos = (equipos ?? []).filter((e) => !e.eliminado);
 
+  const fechasDisponibles = (fechas ?? []).filter(
+    (f) => f.estado === 'PROGRAMADA' || f.estado === 'EN_JUEGO'
+  );
+
+  const resetForm = () => {
+    reset({
+      fechaId: '' as any,
+      equipoLocalId: '' as any,
+      equipoVisitanteId: '' as any,
+      horaInicioLocal: '',
+    });
+  };
+
   const onSubmit = (data: PartidoFormValues) => {
     const payload: PartidoCreateRequest = {
       fechaId: Number(data.fechaId),
@@ -53,16 +66,18 @@ export function AdminPartidosPage() {
     if (editando) {
       actualizarPartido.mutate(
         { id: editando.id, data: payload },
-        { onSuccess: () => { setEditando(null); reset(); } }
+        {
+          onSuccess: () => { setEditando(null); resetForm(); },
+          onError: () => setTimeout(() => { setEditando(null); resetForm(); }, 1500),
+        }
       );
     } else {
-      crearPartido.mutate(payload, { onSuccess: () => reset() });
+      crearPartido.mutate(payload, { onSuccess: () => resetForm() });
     }
   };
 
   const empezarEdicion = (partido: Partido) => {
     setEditando(partido);
-
     reset({
       fechaId: partido.fechaId,
       equipoLocalId: partido.equipoLocal.id,
@@ -73,7 +88,7 @@ export function AdminPartidosPage() {
 
   const cancelarEdicion = () => {
     setEditando(null);
-    reset({ fechaId: undefined, equipoLocalId: undefined, equipoVisitanteId: undefined, horaInicioLocal: '' });
+    resetForm();
   };
 
   const marcarEnJuego = (partido: Partido) => {
@@ -94,9 +109,9 @@ export function AdminPartidosPage() {
                   {...register('fechaId', { required: 'Elegí una fecha' })}
                 >
                   <option value="">Seleccioná una fecha...</option>
-                  {fechas?.map((f) => (
+                  {fechasDisponibles.map((f) => (
                     <option key={f.id} value={f.id}>
-                      {f.nombre}
+                      {f.nombre} — {f.estado === 'PROGRAMADA' ? 'Programada' : 'En juego'}
                     </option>
                   ))}
                 </select>
@@ -163,22 +178,23 @@ export function AdminPartidosPage() {
       </div>
 
       <div className="col-12 col-lg-8">
-        <div className="d-flex gap-2 mb-3 flex-wrap">
-          <button
-            className={`btn btn-sm ${fechaFiltro === undefined ? 'btn-success' : 'btn-outline-secondary'}`}
-            onClick={() => setFechaFiltro(undefined)}
+        <div className="d-flex gap-3 mb-3">
+          <select
+            className="form-select"
+            style={{ maxWidth: '280px' }}
+            value={fechaFiltro ?? ''}
+            onChange={(e) => setFechaFiltro(e.target.value ? Number(e.target.value) : undefined)}
           >
-            Todas las fechas
-          </button>
-          {fechas?.map((f) => (
-            <button
-              key={f.id}
-              className={`btn btn-sm ${fechaFiltro === f.id ? 'btn-success' : 'btn-outline-secondary'}`}
-              onClick={() => setFechaFiltro(f.id)}
-            >
-              {f.nombre}
-            </button>
-          ))}
+            <option value="">Todas las fechas</option>
+            {fechas?.map((f) => (
+              <option key={f.id} value={f.id}>
+                {f.nombre} — {
+                  f.estado === 'PROGRAMADA' ? 'Programada' :
+                  f.estado === 'EN_JUEGO' ? 'En juego' : 'Finalizada'
+                }
+              </option>
+            ))}
+          </select>
         </div>
 
         {isLoading ? (

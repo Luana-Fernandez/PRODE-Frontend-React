@@ -5,15 +5,17 @@ import { AppLayout } from '@/components/AppLayout';
 import { LoginPage } from '@/pages/LoginPage';
 import { RegisterPage } from '@/pages/RegisterPage';
 import { HomePage } from '@/pages/HomePage';
-import { PartidosPage } from '@/pages/PartidosPage';
+import { PartidosPage } from '@/pages/user/PartidosPage';
 import { RankingPage } from '@/pages/RankingPage';
 import { GruposPage } from '@/pages/GruposPage';
-import { MisPronosticosPage } from '@/pages/MisPronosticosPage';
+import { MisPronosticosPage } from '@/pages/user/MisPronosticosPage';
 import { AdminLayout } from '@/pages/admin/AdminLayout';
 import { AdminEquiposPage } from '@/pages/admin/AdminEquiposPage';
 import { AdminFechasPage } from '@/pages/admin/AdminFechasPage';
 import { AdminPartidosPage } from '@/pages/admin/AdminPartidosPage';
 import { AdminResultadosPage } from '@/pages/admin/AdminResultadosPage';
+import { AdminPronosticosPage } from './pages/admin/AdminPronosticosPage';
+import { AdminUsuariosPage } from './pages/admin/AdminUsuariosPage';
 import { NotFoundPage } from '@/pages/NotFoundPage';
 
 export function App() {
@@ -35,14 +37,14 @@ export function App() {
               <Route path="/mis-pronosticos" element={<MisPronosticosPage />} />
 
               {/* Rutas solo ADMIN */}
-              <Route element={<ProtectedRoute rolesPermitidos={['ADMIN']} />}>
-                <Route path="/admin" element={<AdminLayout />}>
-                  <Route index element={<Navigate to="equipos" replace />} />
-                  <Route path="equipos" element={<AdminEquiposPage />} />
-                  <Route path="fechas" element={<AdminFechasPage />} />
-                  <Route path="partidos" element={<AdminPartidosPage />} />
-                  <Route path="resultados" element={<AdminResultadosPage />} />
-                </Route>
+              <Route path="/admin" element={<AdminLayout />}>
+                <Route index element={<Navigate to="equipos" replace />} />
+                <Route path="equipos" element={<AdminEquiposPage />} />
+                <Route path="fechas" element={<AdminFechasPage />} />
+                <Route path="partidos" element={<AdminPartidosPage />} />
+                <Route path="resultados" element={<AdminResultadosPage />} />
+                <Route path="pronosticos" element={<AdminPronosticosPage />} />
+                <Route path="usuarios" element={<AdminUsuariosPage />} />
               </Route>
             </Route>
           </Route>

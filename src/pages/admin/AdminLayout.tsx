@@ -36,6 +36,18 @@ export function AdminLayout() {
             Resultados
           </NavLink>
         </li>
+        <li className="nav-item">
+          <NavLink to="/admin/pronosticos" className={tabClass}>
+            <i className="bi bi-bar-chart-fill me-1" />
+            Pronósticos
+          </NavLink>
+        </li>
+        <li className="nav-item">
+          <NavLink to="/admin/usuarios" className={tabClass}>
+            <i className="bi bi-people-fill me-1" />
+            Usuarios
+          </NavLink>
+        </li>
       </ul>
 
       <Outlet />

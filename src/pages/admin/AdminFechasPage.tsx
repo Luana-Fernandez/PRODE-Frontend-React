@@ -25,8 +25,8 @@ export function AdminFechasPage() {
       actualizarFecha.mutate(
         { id: editando.id, data: { nombre: data.nombre } },
         {
-          onSuccess: () => { setEditando(null); reset(); },
-          onError: () => setTimeout(() => { setEditando(null); reset(); }, 1500),
+          onSuccess: () => { setEditando(null); reset({ nombre: '' }); },
+          onError: () => setTimeout(() => { setEditando(null); reset({ nombre: '' }); }, 1500),
         }
       );
     } else {

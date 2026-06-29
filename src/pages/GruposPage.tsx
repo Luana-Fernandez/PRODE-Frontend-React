@@ -143,6 +143,7 @@ function RankingDeGrupo({ grupoId }: { grupoId: number }) {
 
 export function GruposPage() {
   const { usuario } = useAuth();
+  const isAdmin = usuario?.rol === 'ADMIN';
   const { data: grupos, isLoading } = useGrupos();
   const eliminarGrupo = useEliminarGrupo();
   const [modalAbierto, setModalAbierto] = useState<'crear' | 'unirse' | null>(null);
@@ -157,23 +158,36 @@ export function GruposPage() {
           <span className="text-eyebrow d-block">Competí en privado</span>
           <h1 className="h3 mb-0">Grupos</h1>
         </div>
-        <div className="d-flex gap-2">
-          <button className="btn btn-outline-success btn-sm" onClick={() => setModalAbierto('unirse')}>
-            <i className="bi bi-person-plus me-1" />
-            Unirme con código
-          </button>
-          <button className="btn btn-success btn-sm" onClick={() => setModalAbierto('crear')}>
-            <i className="bi bi-plus-lg me-1" />
-            Crear grupo
-          </button>
-        </div>
+        {!isAdmin && (
+          <div className="d-flex gap-2">
+            <button
+              className="btn btn-outline-success btn-sm"
+              onClick={() => setModalAbierto('unirse')}
+            >
+              <i className="bi bi-person-plus me-1" />
+              Unirme con código
+            </button>
+
+            <button
+              className="btn btn-success btn-sm"
+              onClick={() => setModalAbierto('crear')}
+            >
+              <i className="bi bi-plus-lg me-1" />
+              Crear grupo
+            </button>
+          </div>
+        )}
       </div>
 
       {!grupos || grupos.length === 0 ? (
         <EmptyState
           icon="bi-people"
-          title="No hay grupos todavía"
-          description="Creá uno o unite con un código de invitación."
+          title="No hay grupos"
+          description={
+            isAdmin
+              ? "Todavía no existen grupos registrados."
+              : "Creá uno o unite con un código de invitación."
+          }
         />
       ) : (
         <div className="row g-3">
@@ -221,8 +235,13 @@ export function GruposPage() {
         </div>
       )}
 
-      {modalAbierto === 'crear' && <ModalCrearGrupo onClose={() => setModalAbierto(null)} />}
-      {modalAbierto === 'unirse' && <ModalUnirseGrupo onClose={() => setModalAbierto(null)} />}
+      {!isAdmin && modalAbierto === 'crear' && (
+        <ModalCrearGrupo onClose={() => setModalAbierto(null)} />
+      )}
+
+      {!isAdmin && modalAbierto === 'unirse' && (
+        <ModalUnirseGrupo onClose={() => setModalAbierto(null)} />
+      )}
     </div>
   );
 }

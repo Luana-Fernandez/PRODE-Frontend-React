@@ -62,7 +62,7 @@ export interface PartidoUpdateRequest {
 }
 
 export interface PartidoResultadoRequest {
-  idPartido: number;
+  partidoId: number;
   golLocal: number;
   golVisitante: number;
 }

@@ -13,12 +13,14 @@ export const gruposKeys = {
 export function useGrupos() {
   const { usuario } = useAuth();
   return useQuery({
-    queryKey: gruposKeys.all,
-    queryFn: () => gruposApi.listar(usuario!.id),
+    queryKey: [...gruposKeys.all, usuario?.rol],
+    queryFn: () =>
+      usuario?.rol === 'ADMIN'
+        ? gruposApi.listarTodos()
+        : gruposApi.listar(usuario!.id),
     enabled: !!usuario,
   });
 }
-
 export function useGrupo(id?: number) {
   return useQuery({
     queryKey: gruposKeys.detalle(id as number),
