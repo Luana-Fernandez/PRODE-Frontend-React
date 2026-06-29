@@ -6,6 +6,7 @@ export interface UsuarioResponse {
   email: string;
   rol: string;
   idGrupoPropio: number | null;
+  activo: boolean;
 }
 
 export interface UsuarioUpdateRequest {
@@ -22,4 +23,7 @@ export const usuariosApi = {
     apiClient.put<UsuarioResponse>(`/usuarios/${id}`, data).then((r) => r.data),
 
   eliminar: (id: number) => apiClient.delete<void>(`/usuarios/${id}`).then((r) => r.data),
+
+  restaurar: (id: number) =>
+    apiClient.put<void>(`/usuarios/${id}/restore`).then((r) => r.data),
 };

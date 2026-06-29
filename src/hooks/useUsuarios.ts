@@ -25,6 +25,7 @@ export function useActualizarUsuario() {
     onSuccess: () => {
       toast.success('Datos actualizados');
       queryClient.invalidateQueries({ queryKey: ['usuarios'] });
+      queryClient.invalidateQueries({ queryKey: ['usuarios', 'me'] });
     },
     onError: (error) => toast.error(getApiErrorMessage(error)),
   });
@@ -36,6 +37,18 @@ export function useEliminarUsuario() {
     mutationFn: (id: number) => usuariosApi.eliminar(id),
     onSuccess: () => {
       toast.success('Usuario eliminado');
+      queryClient.invalidateQueries({ queryKey: ['usuarios'] });
+    },
+    onError: (error) => toast.error(getApiErrorMessage(error)),
+  });
+}
+
+export function useRestaurarUsuario() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => usuariosApi.restaurar(id),
+    onSuccess: () => {
+      toast.success('Usuario restaurado');
       queryClient.invalidateQueries({ queryKey: ['usuarios'] });
     },
     onError: (error) => toast.error(getApiErrorMessage(error)),

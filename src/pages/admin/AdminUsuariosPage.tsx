@@ -1,15 +1,31 @@
-import { useState } from 'react';
-import { useUsuarios, useEliminarUsuario } from '@/hooks/useUsuarios';
+import { useMemo, useState } from 'react';
+import {
+  useUsuarios,
+  useEliminarUsuario,
+  useRestaurarUsuario,
+} from '@/hooks/useUsuarios';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { EmptyState } from '@/components/EmptyState';
 import type { UsuarioResponse } from '@/api/usuariosApi';
 
+type Tab = 'ACTIVOS' | 'INACTIVOS';
+
 export function AdminUsuariosPage() {
   const { data: usuarios, isLoading } = useUsuarios();
   const eliminarUsuario = useEliminarUsuario();
+  const restaurarUsuario = useRestaurarUsuario();
+
+  const [tab, setTab] = useState<Tab>('ACTIVOS');
 
   const [usuarioAEliminar, setUsuarioAEliminar] =
     useState<UsuarioResponse | null>(null);
+
+  const usuariosFiltrados = useMemo(() => {
+    if (!usuarios) return [];
+    return usuarios.filter((u) =>
+      tab === 'ACTIVOS' ? u.activo : !u.activo
+    );
+  }, [usuarios, tab]);
 
   if (isLoading) return <LoadingScreen label="Cargando usuarios..." />;
 
@@ -23,11 +39,33 @@ export function AdminUsuariosPage() {
 
   return (
     <div>
-      {!usuarios || usuarios.length === 0 ? (
+      {/* TABS */}
+      <div className="d-flex gap-2 mb-3">
+        <button
+          type="button"
+          className={`btn btn-sm ${tab === 'ACTIVOS' ? 'btn-success' : 'btn-outline-secondary'}`}
+          onClick={() => setTab('ACTIVOS')}
+        >
+          Activos
+        </button>
+        <button
+          type="button"
+          className={`btn btn-sm ${tab === 'INACTIVOS' ? 'btn-success' : 'btn-outline-secondary'}`}
+          onClick={() => setTab('INACTIVOS')}
+        >
+          Inactivos
+        </button>
+      </div>
+
+      {usuariosFiltrados.length === 0 ? (
         <EmptyState
           icon="bi-people"
-          title="No hay usuarios registrados"
-          description="Aún no se registró ningún usuario en el sistema."
+          title={tab === 'ACTIVOS' ? 'No hay usuarios activos' : 'No hay usuarios inactivos'}
+          description={
+            tab === 'ACTIVOS'
+              ? 'Aún no se registró ningún usuario en el sistema.'
+              : 'No hay usuarios eliminados por el momento.'
+          }
         />
       ) : (
         <div className="card card-soft">
@@ -44,7 +82,7 @@ export function AdminUsuariosPage() {
                 </tr>
               </thead>
               <tbody>
-                {usuarios.map((u) => (
+                {usuariosFiltrados.map((u) => (
                   <tr key={u.id}>
                     <td className="font-mono small text-secondary">{u.id}</td>
                     <td className="fw-semibold">{u.nombreUsuario}</td>
@@ -58,14 +96,26 @@ export function AdminUsuariosPage() {
                       {u.idGrupoPropio ? `#${u.idGrupoPropio}` : <span className="text-secondary">—</span>}
                     </td>
                     <td className="text-end">
-                      <button
-                        type="button"
-                        className="btn btn-sm btn-outline-danger"
-                        onClick={() => setUsuarioAEliminar(u)}
-                      >
-                        <i className="bi bi-trash me-1" />
-                        Eliminar
-                      </button>
+                      {tab === 'ACTIVOS' ? (
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-danger"
+                          onClick={() => setUsuarioAEliminar(u)}
+                        >
+                          <i className="bi bi-trash me-1" />
+                          Eliminar
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-outline-success"
+                          onClick={() => restaurarUsuario.mutate(u.id)}
+                          disabled={restaurarUsuario.isPending}
+                        >
+                          <i className="bi bi-arrow-counterclockwise me-1" />
+                          Restaurar
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -99,8 +149,8 @@ export function AdminUsuariosPage() {
                   {usuarioAEliminar.email})?
                 </p>
                 <p className="small text-secondary mt-2 mb-0">
-                  El usuario deja de aparecer en el sistema, pero sus datos no
-                  se borran de forma permanente.
+                  El usuario deja de aparecer en el sistema, pero podés
+                  restaurarlo después desde la pestaña "Inactivos".
                 </p>
               </div>
               <div className="modal-footer">
