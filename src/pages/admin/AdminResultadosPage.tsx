@@ -5,19 +5,25 @@ import { EmptyState } from '@/components/EmptyState';
 import { ScoreboardCard } from '@/components/ScoreboardCard';
 import type { Partido } from '@/types/domain';
 
-function FormResultado({ partido }: { partido: Partido }) {
+interface ResultadoPendiente {
+  partido: Partido;
+  golLocal: number;
+  golVisitante: number;
+}
+
+function FormResultado({
+  partido,
+  onSolicitarConfirmacion,
+}: {
+  partido: Partido;
+  onSolicitarConfirmacion: (r: ResultadoPendiente) => void;
+}) {
   const [golLocal, setGolLocal] = useState(0);
   const [golVisitante, setGolVisitante] = useState(0);
-  const cargarResultado = useCargarResultado();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    cargarResultado.mutate(
-      { partidoId: partido.id, golLocal, golVisitante },
-      {
-        onSuccess: () => { setGolLocal(0); setGolVisitante(0); },
-      }
-    );
+    onSolicitarConfirmacion({ partido, golLocal, golVisitante });
   };
 
   return (
@@ -41,16 +47,9 @@ function FormResultado({ partido }: { partido: Partido }) {
           onChange={(e) => setGolVisitante(Math.max(0, Number(e.target.value)))}
         />
       </div>
-      <button
-        type="submit"
-        className="btn btn-warning btn-sm ms-auto"
-        disabled={cargarResultado.isPending}
-      >
-        {cargarResultado.isPending ? (
-          <span className="spinner-border spinner-border-sm" />
-        ) : (
-          <><i className="bi bi-clipboard-check me-1" />Cargar resultado</>
-        )}
+      <button type="submit" className="btn btn-warning btn-sm ms-auto">
+        <i className="bi bi-clipboard-check me-1" />
+        Cargar resultado
       </button>
     </form>
   );
@@ -58,10 +57,28 @@ function FormResultado({ partido }: { partido: Partido }) {
 
 export function AdminResultadosPage() {
   const { data: partidos, isLoading } = usePartidos();
+  const cargarResultado = useCargarResultado();
+
+  const [pendiente, setPendiente] = useState<ResultadoPendiente | null>(null);
 
   const enJuego = (partidos ?? []).filter((p) => p.estadoPartido === 'EN_JUEGO');
 
   if (isLoading) return <LoadingScreen label="Cargando partidos en juego..." />;
+
+  const confirmarCarga = () => {
+    if (!pendiente) return;
+
+    cargarResultado.mutate(
+      {
+        partidoId: pendiente.partido.id,
+        golLocal: pendiente.golLocal,
+        golVisitante: pendiente.golVisitante,
+      },
+      {
+        onSuccess: () => setPendiente(null),
+      }
+    );
+  };
 
   return (
     <div>
@@ -80,9 +97,79 @@ export function AdminResultadosPage() {
         <div className="row">
           {enJuego.map((partido) => (
             <div className="col-12 col-md-6 col-lg-4" key={partido.id}>
-              <ScoreboardCard partido={partido} footer={<FormResultado partido={partido} />} />
+              <ScoreboardCard
+                partido={partido}
+                footer={
+                  <FormResultado
+                    partido={partido}
+                    onSolicitarConfirmacion={setPendiente}
+                  />
+                }
+              />
             </div>
           ))}
+        </div>
+      )}
+
+      {/* MODAL DE CONFIRMACIÓN */}
+      {pendiente && (
+        <div
+          className="modal d-block"
+          style={{ background: 'rgba(0,0,0,0.5)' }}
+          role="dialog"
+        >
+          <div className="modal-dialog modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Confirmar resultado</h5>
+                <button
+                  type="button"
+                  className="btn-close"
+                  onClick={() => setPendiente(null)}
+                />
+              </div>
+              <div className="modal-body">
+                <p className="mb-2">
+                  ¿Confirmás cargar el resultado{' '}
+                  <strong>
+                    {pendiente.golLocal} - {pendiente.golVisitante}
+                  </strong>{' '}
+                  para{' '}
+                  <strong>
+                    {pendiente.partido.equipoLocal.nombre} vs{' '}
+                    {pendiente.partido.equipoVisitante.nombre}
+                  </strong>
+                  ?
+                </p>
+                <p className="small text-secondary mb-0">
+                  Esta acción dispara el cálculo de puntos de todos los
+                  pronósticos para este partido y no se puede deshacer fácilmente.
+                </p>
+              </div>
+              <div className="modal-footer">
+                <button
+                  type="button"
+                  className="btn btn-outline-secondary"
+                  onClick={() => setPendiente(null)}
+                  disabled={cargarResultado.isPending}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-warning"
+                  onClick={confirmarCarga}
+                  disabled={cargarResultado.isPending}
+                >
+                  {cargarResultado.isPending ? (
+                    <span className="spinner-border spinner-border-sm" />
+                  ) : (
+                    'Confirmar carga'
+                  )}
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
       )}
     </div>
