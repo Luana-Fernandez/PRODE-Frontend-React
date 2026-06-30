@@ -38,18 +38,18 @@ export function RankingPage() {
               <tbody>
                 {ranking.map((item, idx) => {
                   const posicion = item.posicion ?? idx + 1;
-                  const esPropio = item.idUsuario === usuario?.id;
+                  const esPropio = item.usuarioId === usuario?.id;
                   return (
-                    <tr key={item.idUsuario} className={esPropio ? 'fila-ranking-propia' : ''}>
+                    <tr key={item.usuarioId} className={esPropio ? 'fila-ranking-propia' : ''}>
                       <td>
                         <span className={`podio-puesto ${claseDelPuesto(posicion)}`}>{posicion}</span>
                       </td>
                       <td className="fw-semibold">
-                        {item.nombreUsuario}
+                        {item.usuarioNombre}
                         {esPropio && <span className="badge bg-warning text-dark ms-2">Vos</span>}
                       </td>
-                      <td className="text-end font-mono">{item.resultadosExactos}</td>
-                      <td className="text-end font-mono fw-bold fs-5">{item.puntosTotales}</td>
+                      <td className="text-end font-mono">{item.exactas}</td>
+                      <td className="text-end font-mono fw-bold fs-5">{item.puntos}</td>
                     </tr>
                   );
                 })}

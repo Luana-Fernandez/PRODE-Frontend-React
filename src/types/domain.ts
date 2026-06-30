@@ -122,11 +122,12 @@ export interface PrediccionCreateRequest {
 }
 
 // ---------- Ranking ----------
+// Alineado exactamente con RankingResponseDTO del backend
 export interface RankingItem {
-  idUsuario: number;
-  nombreUsuario: string;
-  puntosTotales: number;
-  resultadosExactos: number;
+  usuarioId: number;
+  usuarioNombre: string;
+  puntos: number;
+  exactas: number;
   posicion?: number;
 }
 

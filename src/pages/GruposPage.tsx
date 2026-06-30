@@ -130,10 +130,10 @@ function RankingDeGrupo({ grupoId }: { grupoId: number }) {
       </thead>
       <tbody>
         {ranking.map((item, idx) => (
-          <tr key={item.idUsuario} className={item.idUsuario === usuario?.id ? 'fila-ranking-propia' : ''}>
+          <tr key={item.usuarioId} className={item.usuarioId === usuario?.id ? 'fila-ranking-propia' : ''}>
             <td className="font-mono">{item.posicion ?? idx + 1}</td>
-            <td>{item.nombreUsuario}</td>
-            <td className="text-end font-mono fw-bold">{item.puntosTotales}</td>
+            <td>{item.usuarioNombre}</td>
+            <td className="text-end font-mono fw-bold">{item.puntos}</td>
           </tr>
         ))}
       </tbody>
