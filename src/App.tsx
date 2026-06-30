@@ -10,6 +10,7 @@ import { RankingPage } from '@/pages/RankingPage';
 import { GruposPage } from '@/pages/GruposPage';
 import { MisPronosticosPage } from '@/pages/user/MisPronosticosPage';
 import { PerfilPage } from '@/pages/user/PerfilPage';
+import { PronosticosPartidoPage } from './pages/user/Pronosticospartidopage';
 import { AdminLayout } from '@/pages/admin/AdminLayout';
 import { AdminEquiposPage } from '@/pages/admin/AdminEquiposPage';
 import { AdminFechasPage } from '@/pages/admin/AdminFechasPage';
@@ -37,6 +38,7 @@ export function App() {
               <Route path="/grupos" element={<GruposPage />} />
               <Route path="/mis-pronosticos" element={<MisPronosticosPage />} />
               <Route path="/perfil" element={<PerfilPage />} />
+              <Route path="/pronosticos/:partidoId" element={<PronosticosPartidoPage />} />
 
               {/* Rutas solo ADMIN */}
               <Route path="/admin" element={<AdminLayout />}>

@@ -1,3 +1,4 @@
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/auth/useAuth';
 import { usePrediccionesDeUsuario } from '@/hooks/usePredicciones';
 import { LoadingScreen } from '@/components/LoadingScreen';
@@ -8,6 +9,7 @@ import { EstadoPartidoBadge } from '@/components/EstadoBadge';
 export function MisPronosticosPage() {
   const { usuario } = useAuth();
   const { data: predicciones, isLoading } = usePrediccionesDeUsuario(usuario?.id);
+  const navigate = useNavigate();
 
   if (isLoading) return <LoadingScreen label="Cargando tus pronósticos..." />;
 
@@ -56,6 +58,7 @@ export function MisPronosticosPage() {
                   <th>Tu pronóstico</th>
                   <th>Estado</th>
                   <th className="text-end">Resultado</th>
+                  <th className="text-end">Otros</th>
                 </tr>
               </thead>
               <tbody>
@@ -72,6 +75,16 @@ export function MisPronosticosPage() {
                     </td>
                     <td className="text-end">
                       <PuntosPill puntos={p.puntosObtenidos} esExacta={p.esExacta} />
+                    </td>
+                    <td className="text-end">
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-outline-secondary"
+                        onClick={() => navigate(`/pronosticos/${p.partidoId}`)}
+                      >
+                        <i className="bi bi-people me-1" />
+                        Ver todos
+                      </button>
                     </td>
                   </tr>
                 ))}
